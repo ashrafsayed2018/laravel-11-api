@@ -6,30 +6,54 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        return response()->json($response, 201);
+        try {
+            // Validate request data
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+    
+            // Create new user
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+            ]);
+    
+            // Generate token
+            $token = $user->createToken('auth_token')->plainTextToken;
+    
+            // Success response
+            $response = [
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                    ],
+                    'access_token' => $token,
+                    'expires_in' => 3600 // Optional, if using time-limited tokens
+                ]
+            ];
+    
+            return response()->json($response, 201);
+    
+        } catch (ValidationException $e) {
+            // Handle validation errors with a custom error response
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        }
     }
 }
