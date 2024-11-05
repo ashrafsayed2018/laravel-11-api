@@ -96,8 +96,8 @@ class PostController extends Controller
     {
         try {
             // Find the post by ID or throw a 404 error if not found
-            $post = Post::findOrFail($id);
-    
+            $post = Post::with('user')->findOrFail($id);
+
             // If found, return the post
             return response()->json([
                 'status' => 'success',
