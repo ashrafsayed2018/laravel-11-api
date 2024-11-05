@@ -13,6 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
  Route::get('/post/{id}', [PostController::class, 'show']);
  // route for get all posts
  Route::get('/posts', [PostController::class, 'index']);
+ 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
