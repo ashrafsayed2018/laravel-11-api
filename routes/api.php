@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,5 +32,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // route for delete post
     Route::delete('/post/delete/{id}', [PostController::class, 'destroy']);
+
+    // route for create comment 
+
+    Route::post('/comment/store', [CommentController::class, 'store']);
+
+    // route for update comment
+    Route::patch('/comment/update/{id}', [CommentController::class, 'update']);
+
+    // route for delete comment
+    Route::delete('/comment/delete/{id}', [CommentController::class, 'destroy']);
+
+    // route for like or unlike post
+    Route::post('/like/unlike/{id}', [LikeController::class, 'likeOrUnlike']);
 });
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SinglePostResource;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -96,7 +97,9 @@ class PostController extends Controller
     {
         try {
             // Find the post by ID or throw a 404 error if not found
-            $post = Post::with('user')->findOrFail($id);
+            // $post = Post::with(['user', 'comments','likes'])->findOrFail($id);
+
+            $post = new SinglePostResource(Post::findOrFail($id));
 
             // If found, return the post
             return response()->json([
